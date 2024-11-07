@@ -1,6 +1,6 @@
 # Test Cases for Question 3
 
-## table of contents
+## Table of Contents
 1. [Weapons API Test Cases](#weapons-api-test-cases)
 2. [Materials API Test Cases](#materials-api-test-cases)
 

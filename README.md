@@ -1,71 +1,95 @@
-# ⚔️ WEAPON QUEST ⚔️
+# ⚔️ WEAPON QUEST - QA ⚔️
 
-## [DOCS](./docs/getting-started.md)
+## Table of Contents
+- [⚔️ WEAPON QUEST - QA ⚔️](#️-weapon-quest---qa-️)
+  - [Table of Contents](#table-of-contents)
+    - [Instructions are as followed:](#instructions-are-as-followed)
+    - [Setup:](#setup)
+  - [Q3 and Q4](#q3-and-q4)
+    - [Question 3](#question-3)
+    - [Question 4](#question-4)
+  - [Q5](#q5)
+    - [list of files changed from original for diffs](#list-of-files-changed-from-original-for-diffs)
+    - [Files added to complete this question](#files-added-to-complete-this-question)
+    - [How to run](#how-to-run)
+    - [Question 5 part 1](#question-5-part-1)
+    - [Question 5 part 2](#question-5-part-2)
 
-**GOAL**
+### Instructions are as followed:
 
-- Complete the Quests listed below.
-- Provide access to your code, e.g. link to a GitHub repo.
-  <br />
-  <br />
+1. Fork the Repository into your own Github (Top right corner) or download project locally
+2. Add Jest to the project (Add to package.json), Install all node packages and follow instructions in the docs/getting-started.md
+3. Create Test Cases for all Materials API endpoints and for "/api/weapon/:id/maxBuildQuantity" in a "/test_cases" folder
+4. Write API Tests for all the endpoints
+5. Include an End-to-end test that composes of the following: 
+    - Create a weapon that follows the mapping (weapon_qa.png)
+    - Calculate the power level of the weapon using a recursive query
+6. Share link to Github Repo
 
-**TERMINOLOGIES**
+<br>
 
-- A composition is a mapping between materials.
-- A material can be composed of other multiple materials, each with a specified quantity.
-- A composition is a top down tree without repeated materials.
-- A weapon is composed of **multiple materials**. It has a **name**, **power_level**, and **qty**. It can also be one of the following **status**: "new" or "broken".
-- A material has a **base_power**, which influences the **power_level** of any weapon that uses it.
-  > For example, an "Axe" weapon is composed of materials with ID 9 and 12, has a power level of:
-  >
-  > > ID 9 ➡️ 90 + 5*(130 + 10*220) = **11,740**
-  > > > 90 = the Base Power of material ID(9)
-  > > >
-  > > > 5 = the quantity required to make 1 unit of material ID(9) from ID(10)
-  > > >
-  > > > 130 = the Base Power of material ID(10)
-  > > >
-  > > > 10 = the quantity required to make 1 unit of material ID(10) from ID(11)
-  > > >
-  > > > 220 = the Base Power of material ID(11)
-  > >
-  > > ID 12 ➡️ **300**
-  > > > 300 = the Base Power of material ID (12)
-  > >
-  > > Total would be **12040**
+### Setup:
+can follow Q2 for set up in the `docs/getting-started.md` to get appropriate database and all node packages
 
-Reference diagram from the seed data:
-<br />
+<br>
 
-<img width="1004" alt="materials" src="https://user-images.githubusercontent.com/13532850/235346434-2f318669-ff0b-4b34-8156-5942eafa097b.png">
+## Q3 and Q4
 
-<br />
-<br />
+### Question 3
 
-**QUESTS**:
+In the `/test_cases` folder, for convenience I have included a file called `test_cases/q4_weapon_quests_insomnia_collection_and_test_suite.json` to following along with Q3's test cases
 
-1. Design and create a **Weapon** object in the database and a model class. Create the following seed weapons\*:
+[Test Cases format inspiration](https://www.browserstack.com/guide/how-to-write-test-cases)
 
-   > **Excalibur** composed of the following list of materials: ID(1), ID(6), ID(9), ID(12)
-   >
-   > **Magic Staff** composed of the following material: ID(6)
+All test case IDs in the [Test cases document](test_cases/q3_materials_and_maxBuild.md) can be referenced with the Insomnia collection ![alt text](test_cases/q3_test_case_ID_Reference.png)
 
-   \*_Seed files for materials & compositions are already created._
 
-2. Implement method on the Weapon class to compute total power level of a weapon based on its composition(s).
+### Question 4
+  
+API endpoints testing was half complete with the original Insomnia Collection. I Took advantage of Insomnia's Design Document Test Suite which uses **Mocha.js** for test framework and **Chai.js** for the assertions.
+![alt text](test_cases/q4_API_Endpoint_Test_Suite_Reference.png)
 
-3. API endpoint to update material power level and making sure the weapon(s) that uses it is also updated.
+<br>
+<br>
+<br>
 
-4. CRUD methods for **Material** class.
-   _The "**find**" method is already created_
-   > Note: Deletion of an material should mark the weapon that uses the material as "broken" and updates the "deleted_at" field of the parent material(s)
-   >
-   > Another note: Update of an material should follow quest #3's logic as well
-5. API endpoint to fetch the maximum quantity of a single **Weapon** that we can build.
-   > Example. **Axe** can be built:
-   >
-   > ID 9 ➡️ 25 + ((100 + (110/10) ) / 5) = 47
-   >
-   > ID 12 ➡️ 120
-   >
-   > Max number of builds = 47
+## Q5
+### list of files changed from original for diffs
+- `package.json` added Jest and various scripts for testing
+- `knexfile.js` added a test environment for modularity and ease of reference with jest
+- `jest.config.js` added a test DB environment variable for test DB dependency injection
+- `.env` added to fit system requirements and integration
+- `/config/dbConfig.js` decoupled test and production DB so different classes can dynamically switch based on environment. See below:
+- - `/models/composition.js`
+- - `/models/material.js`
+- - `/models/weapon.js`
+
+### Files added to complete this question
+- `/database/migrations_test` Created separate test DB Migration away from production DB
+- `/database/seeds_test` Seeded separate test DB
+- **/jest_testing** the main folder for End-to-end test
+
+### How to run
+
+`npm test` in the command line
+
+included scripts `npm run trollback`, `npm run tmigrate`, and `npm run tseed` for convenience and ease of checking/debugging each step of the test DB
+
+### Question 5 part 1
+Create a weapon that follows the mapping of the image(weapon_qa.png)
+
+made 2 state hooks on each test to (before hook) rollback, migrate, seed, and (after hook) close database connect to ensure modularity and clean up
+
+Asserted id, name, and composition material matched with image
+
+### Question 5 part 2
+
+called recursive query to calculate power level in the weapons class,`getPowerLevel` method (why making dynamic environment was necessary) which is seeded at `/database/seeds_test/004_test_power_level.js`
+
+Asserted name and correct power level (did the math and tested with production DB to verify this haha)
+
+**extras:**
+
+tested correct seeding and column size for each test table
+
+[Back to Top](#table-of-contents)
